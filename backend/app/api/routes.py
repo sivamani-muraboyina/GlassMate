@@ -14,6 +14,7 @@ from app.schemas.candidate import (
 )
 from app.schemas.project import ProjectImportRequest, ProjectResponse
 from app.schemas.job import JobIngestionRequest, JobResponse
+from app.schemas.job_analysis import JobAnalysisResponse
 from app.schemas.resume import (
     ResumeCreateRequest,
     ResumeProposalRequest,
@@ -25,12 +26,14 @@ from app.services.github import GitHubRepositoryError
 from app.services.project_intelligence import ProjectIntelligenceService
 from app.services.resume_management import ResumeManagementService
 from app.services.job_ingestion import JobIngestionService
+from app.services.job_analysis import JobAnalysisService
 
 router = APIRouter()
 candidate_service = CandidateOnboardingService()
 project_service = ProjectIntelligenceService()
 resume_service = ResumeManagementService()
 job_service = JobIngestionService()
+job_analysis_service = JobAnalysisService()
 
 
 def candidate_response(candidate: Candidate) -> CandidateResponse:
@@ -211,3 +214,12 @@ def ingest_job(
     if not ingested:
         response = response.model_copy(update={"ingested": False})
     return response
+
+
+@router.post("/jobs/{job_id}/analyze", response_model=JobAnalysisResponse)
+def analyze_job(job_id: int, session: Session = Depends(get_db)) -> JobAnalysisResponse:
+    try:
+        job = job_analysis_service.analyze(session, job_id)
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    return JobAnalysisResponse.model_validate(job, from_attributes=True)

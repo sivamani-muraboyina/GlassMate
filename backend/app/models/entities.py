@@ -227,6 +227,9 @@ class Job(Base, TimestampMixin):
     raw_description: Mapped[str] = mapped_column(Text)
     salary: Mapped[str | None] = mapped_column(String(200))
     applicant_count: Mapped[int | None] = mapped_column(Integer)
+    experience_level: Mapped[str | None] = mapped_column(String(100))
+    posting_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    application_method: Mapped[str | None] = mapped_column(String(200))
 
     company: Mapped[Company | None] = relationship(back_populates="jobs")
     requirements: Mapped[list["JobRequirement"]] = relationship(back_populates="job", cascade="all, delete-orphan")

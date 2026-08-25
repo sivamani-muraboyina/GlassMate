@@ -64,6 +64,10 @@ Normalized job ingestion is available through `POST /jobs/ingest`.
 It computes source fingerprints, reuses duplicate jobs and companies,
 and keeps unavailable salary or applicant-count fields as `NULL`.
 
+Structured job analysis is available through `POST /jobs/{job_id}/analyze`.
+It extracts explicit metadata and categorizes clearly headed requirements
+without inventing missing job information.
+
 Run the tests with:
 
 ```powershell
@@ -76,6 +80,8 @@ Phase 3 adds cached GitHub project understanding. Phase 4 adds
 immutable resume version management. Agents, external integrations,
 and frontend work are planned for later phases. Phase 5 adds
 adapter-ready job ingestion and deduplication.
+Phase 6 adds structured job analysis. Agents, external integrations, and
+frontend work are planned for later phases.
 
 ## Tech Stack
 

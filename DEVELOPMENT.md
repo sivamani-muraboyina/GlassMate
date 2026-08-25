@@ -19,7 +19,7 @@ Status: COMPLETE
 Status: COMPLETE
 
 ## Phase 6 — Job Analysis
-Status: NOT STARTED
+Status: COMPLETE
 
 ## Phase 7 — Job Matching
 Status: NOT STARTED
