@@ -72,6 +72,10 @@ Job matching is available through `POST /jobs/{job_id}/matches/{candidate_id}`.
 It stores requirement classifications and calculates a deterministic score
 using the configured required/preferred weights while excluding `UNKNOWN`.
 
+Company intelligence is available through `POST /jobs/{job_id}/company-intelligence`.
+It stores source-labeled company information and role summaries, preferring
+`UNKNOWN` when supporting information is unavailable.
+
 Run the tests with:
 
 ```powershell
@@ -86,7 +90,8 @@ and frontend work are planned for later phases. Phase 5 adds
 adapter-ready job ingestion and deduplication.
 Phase 6 adds structured job analysis. Agents, external integrations, and
 frontend work are planned for later phases. Phase 7 adds deterministic job
-matching and explainable routing categories.
+matching and explainable routing categories. Phase 8 adds source-aware
+company intelligence and evidence links.
 
 ## Tech Stack
 

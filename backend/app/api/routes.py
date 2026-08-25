@@ -17,6 +17,7 @@ from app.schemas.project import ProjectImportRequest, ProjectResponse
 from app.schemas.job import JobIngestionRequest, JobResponse
 from app.schemas.job_analysis import JobAnalysisResponse
 from app.schemas.job_match import JobMatchRequest, JobMatchResponse, RequirementMatchResponse
+from app.schemas.company import CompanyIntelligenceRequest, CompanyIntelligenceResponse
 from app.schemas.resume import (
     ResumeCreateRequest,
     ResumeProposalRequest,
@@ -30,6 +31,7 @@ from app.services.resume_management import ResumeManagementService
 from app.services.job_ingestion import JobIngestionService
 from app.services.job_analysis import JobAnalysisService
 from app.services.job_matching import JobMatchingService
+from app.services.company_intelligence import CompanyIntelligenceService
 
 router = APIRouter()
 candidate_service = CandidateOnboardingService()
@@ -38,6 +40,7 @@ resume_service = ResumeManagementService()
 job_service = JobIngestionService()
 job_analysis_service = JobAnalysisService()
 job_matching_service = JobMatchingService()
+company_intelligence_service = CompanyIntelligenceService()
 
 
 def candidate_response(candidate: Candidate) -> CandidateResponse:
@@ -271,4 +274,29 @@ def calculate_job_match(
             )
             for requirement in (job.requirements if job is not None else [])
         ],
+    )
+
+
+@router.post("/jobs/{job_id}/company-intelligence", response_model=CompanyIntelligenceResponse)
+def update_company_intelligence(
+    job_id: int,
+    request: CompanyIntelligenceRequest,
+    session: Session = Depends(get_db),
+) -> CompanyIntelligenceResponse:
+    try:
+        job = company_intelligence_service.update_for_job(session, job_id, request)
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    company = job.company
+    return CompanyIntelligenceResponse(
+        company_id=company.id if company is not None else 0,
+        company_name=company.name if company is not None else "UNKNOWN",
+        role=job.title,
+        role_summary=job.role_summary,
+        salary=job.salary,
+        location=job.location,
+        summary=company.summary if company is not None else None,
+        information=company.information if company is not None else {},
+        information_status=company.information_status if company is not None else "UNKNOWN",
+        evidence_recorded=request.evidence_content is not None,
     )

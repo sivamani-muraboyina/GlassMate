@@ -208,9 +208,23 @@ class Company(Base, TimestampMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(300), unique=True)
     summary: Mapped[str | None] = mapped_column(Text)
+    information: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
     information_status: Mapped[EvidenceStatus] = mapped_column(Enum(EvidenceStatus), default=EvidenceStatus.UNKNOWN)
 
     jobs: Mapped[list["Job"]] = relationship(back_populates="company")
+    evidence: Mapped[list["CompanyEvidence"]] = relationship(
+        back_populates="company", cascade="all, delete-orphan"
+    )
+
+
+class CompanyEvidence(Base):
+    __tablename__ = "company_evidence"
+
+    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"), primary_key=True)
+    evidence_id: Mapped[int] = mapped_column(ForeignKey("evidence.id", ondelete="CASCADE"), primary_key=True)
+
+    company: Mapped[Company] = relationship(back_populates="evidence")
+    evidence: Mapped[Evidence] = relationship()
 
 
 class Job(Base, TimestampMixin):
@@ -230,6 +244,7 @@ class Job(Base, TimestampMixin):
     experience_level: Mapped[str | None] = mapped_column(String(100))
     posting_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     application_method: Mapped[str | None] = mapped_column(String(200))
+    role_summary: Mapped[str | None] = mapped_column(Text)
 
     company: Mapped[Company | None] = relationship(back_populates="jobs")
     requirements: Mapped[list["JobRequirement"]] = relationship(back_populates="job", cascade="all, delete-orphan")

@@ -29,6 +29,7 @@ def test_phase_one_metadata_creates_expected_tables() -> None:
         "claim_evidence",
         "claims",
         "companies",
+        "company_evidence",
         "education",
         "email_interactions",
         "evidence",
