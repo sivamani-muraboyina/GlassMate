@@ -191,6 +191,7 @@ class Resume(Base, TimestampMixin):
 
 class ResumeVersion(Base, TimestampMixin):
     __tablename__ = "resume_versions"
+    __table_args__ = (UniqueConstraint("resume_id", "version_number", name="uq_resume_versions_resume_number"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     resume_id: Mapped[int] = mapped_column(ForeignKey("resumes.id", ondelete="CASCADE"))

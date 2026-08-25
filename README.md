@@ -56,6 +56,10 @@ GitHub project imports are available through:
 Imports are cached by repository content hash and stored with GitHub
 source evidence. Repository data does not prove candidate authorship.
 
+Resume management is available through endpoints for registering an
+approved resume, listing and retrieving versions, creating proposals,
+and explicitly approving or rejecting proposed versions.
+
 Run the tests with:
 
 ```powershell
@@ -64,8 +68,9 @@ pytest
 
 Phase 0 provides the backend foundation. Phase 1 adds the core database
 models and migrations. Phase 2 adds deterministic candidate onboarding.
-Phase 3 adds cached GitHub project understanding. Agents, external
-integrations, and frontend work are planned for later phases.
+Phase 3 adds cached GitHub project understanding. Phase 4 adds
+immutable resume version management. Agents, external integrations,
+and frontend work are planned for later phases.
 
 ## Tech Stack
 
