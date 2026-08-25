@@ -68,6 +68,10 @@ Structured job analysis is available through `POST /jobs/{job_id}/analyze`.
 It extracts explicit metadata and categorizes clearly headed requirements
 without inventing missing job information.
 
+Job matching is available through `POST /jobs/{job_id}/matches/{candidate_id}`.
+It stores requirement classifications and calculates a deterministic score
+using the configured required/preferred weights while excluding `UNKNOWN`.
+
 Run the tests with:
 
 ```powershell
@@ -81,7 +85,8 @@ immutable resume version management. Agents, external integrations,
 and frontend work are planned for later phases. Phase 5 adds
 adapter-ready job ingestion and deduplication.
 Phase 6 adds structured job analysis. Agents, external integrations, and
-frontend work are planned for later phases.
+frontend work are planned for later phases. Phase 7 adds deterministic job
+matching and explainable routing categories.
 
 ## Tech Stack
 

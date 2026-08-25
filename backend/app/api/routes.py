@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.config import Settings, get_settings
 from app.db.session import get_db
-from app.models import Candidate
+from app.models import Candidate, Job, JobRequirementMatch
 from app.schemas.common import HealthResponse
 from app.schemas.candidate import (
     CandidateOnboardingRequest,
@@ -15,6 +16,7 @@ from app.schemas.candidate import (
 from app.schemas.project import ProjectImportRequest, ProjectResponse
 from app.schemas.job import JobIngestionRequest, JobResponse
 from app.schemas.job_analysis import JobAnalysisResponse
+from app.schemas.job_match import JobMatchRequest, JobMatchResponse, RequirementMatchResponse
 from app.schemas.resume import (
     ResumeCreateRequest,
     ResumeProposalRequest,
@@ -27,6 +29,7 @@ from app.services.project_intelligence import ProjectIntelligenceService
 from app.services.resume_management import ResumeManagementService
 from app.services.job_ingestion import JobIngestionService
 from app.services.job_analysis import JobAnalysisService
+from app.services.job_matching import JobMatchingService
 
 router = APIRouter()
 candidate_service = CandidateOnboardingService()
@@ -34,6 +37,7 @@ project_service = ProjectIntelligenceService()
 resume_service = ResumeManagementService()
 job_service = JobIngestionService()
 job_analysis_service = JobAnalysisService()
+job_matching_service = JobMatchingService()
 
 
 def candidate_response(candidate: Candidate) -> CandidateResponse:
@@ -223,3 +227,48 @@ def analyze_job(job_id: int, session: Session = Depends(get_db)) -> JobAnalysisR
     except LookupError as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
     return JobAnalysisResponse.model_validate(job, from_attributes=True)
+
+
+@router.post(
+    "/jobs/{job_id}/matches/{candidate_id}",
+    response_model=JobMatchResponse,
+)
+def calculate_job_match(
+    job_id: int,
+    candidate_id: int,
+    request: JobMatchRequest,
+    session: Session = Depends(get_db),
+) -> JobMatchResponse:
+    try:
+        job_match = job_matching_service.calculate(session, job_id, candidate_id, request)
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)) from error
+
+    job = session.scalar(select(Job).where(Job.id == job_id).options(selectinload(Job.requirements)))
+    requirement_matches = {
+        match.job_requirement_id: match
+        for match in session.scalars(
+            select(JobRequirementMatch).where(JobRequirementMatch.candidate_id == candidate_id)
+        ).all()
+    }
+    return JobMatchResponse(
+        job_id=job_match.job_id,
+        candidate_id=job_match.candidate_id,
+        score=job_match.score,
+        category=job_match.category or "UNKNOWN",
+        requirements=[
+            RequirementMatchResponse(
+                requirement_id=requirement.id,
+                status=(
+                    requirement_matches[requirement.id].status
+                    if requirement.id in requirement_matches
+                    else "UNKNOWN"
+                ),
+                kind=requirement.kind.value,
+                text=requirement.text,
+            )
+            for requirement in (job.requirements if job is not None else [])
+        ],
+    )
