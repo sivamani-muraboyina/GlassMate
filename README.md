@@ -48,6 +48,14 @@ Candidate onboarding is available through:
   education, and preferences.
 - `GET /candidates/{candidate_id}` to retrieve the saved profile.
 
+GitHub project imports are available through:
+
+- `POST /candidates/{candidate_id}/projects/import` to fetch public
+    repository metadata, README content, and top-level entries.
+
+Imports are cached by repository content hash and stored with GitHub
+source evidence. Repository data does not prove candidate authorship.
+
 Run the tests with:
 
 ```powershell
@@ -56,8 +64,8 @@ pytest
 
 Phase 0 provides the backend foundation. Phase 1 adds the core database
 models and migrations. Phase 2 adds deterministic candidate onboarding.
-Agents, external integrations, and frontend work are planned for later
-phases.
+Phase 3 adds cached GitHub project understanding. Agents, external
+integrations, and frontend work are planned for later phases.
 
 ## Tech Stack
 

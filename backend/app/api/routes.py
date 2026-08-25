@@ -12,10 +12,14 @@ from app.schemas.candidate import (
     ExperienceResponse,
     SkillResponse,
 )
+from app.schemas.project import ProjectImportRequest, ProjectResponse
 from app.services.candidate_onboarding import CandidateOnboardingService
+from app.services.github import GitHubRepositoryError
+from app.services.project_intelligence import ProjectIntelligenceService
 
 router = APIRouter()
 candidate_service = CandidateOnboardingService()
+project_service = ProjectIntelligenceService()
 
 
 def candidate_response(candidate: Candidate) -> CandidateResponse:
@@ -60,3 +64,22 @@ def get_candidate(candidate_id: int, session: Session = Depends(get_db)) -> Cand
     except LookupError as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
     return candidate_response(candidate)
+
+
+@router.post("/candidates/{candidate_id}/projects/import", response_model=ProjectResponse)
+def import_project(
+    candidate_id: int,
+    request: ProjectImportRequest,
+    session: Session = Depends(get_db),
+) -> ProjectResponse:
+    try:
+        project, refreshed = project_service.import_project(
+            session, candidate_id, request.repository_url
+        )
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    except GitHubRepositoryError as error:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(error)) from error
+    return ProjectResponse.model_validate(project, from_attributes=True).model_copy(
+        update={"refreshed": refreshed}
+    )
