@@ -13,6 +13,7 @@ from app.schemas.candidate import (
     SkillResponse,
 )
 from app.schemas.project import ProjectImportRequest, ProjectResponse
+from app.schemas.job import JobIngestionRequest, JobResponse
 from app.schemas.resume import (
     ResumeCreateRequest,
     ResumeProposalRequest,
@@ -23,11 +24,13 @@ from app.services.candidate_onboarding import CandidateOnboardingService
 from app.services.github import GitHubRepositoryError
 from app.services.project_intelligence import ProjectIntelligenceService
 from app.services.resume_management import ResumeManagementService
+from app.services.job_ingestion import JobIngestionService
 
 router = APIRouter()
 candidate_service = CandidateOnboardingService()
 project_service = ProjectIntelligenceService()
 resume_service = ResumeManagementService()
+job_service = JobIngestionService()
 
 
 def candidate_response(candidate: Candidate) -> CandidateResponse:
@@ -196,3 +199,15 @@ def reject_resume_version(
     return transition_resume_version(
         candidate_id, resume_id, version_id, "REJECTED", session
     )
+
+
+@router.post("/jobs/ingest", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
+def ingest_job(
+    request: JobIngestionRequest,
+    session: Session = Depends(get_db),
+) -> JobResponse:
+    job, ingested = job_service.ingest(session, request)
+    response = JobResponse.model_validate(job, from_attributes=True)
+    if not ingested:
+        response = response.model_copy(update={"ingested": False})
+    return response

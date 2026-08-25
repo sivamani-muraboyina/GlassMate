@@ -60,6 +60,10 @@ Resume management is available through endpoints for registering an
 approved resume, listing and retrieving versions, creating proposals,
 and explicitly approving or rejecting proposed versions.
 
+Normalized job ingestion is available through `POST /jobs/ingest`.
+It computes source fingerprints, reuses duplicate jobs and companies,
+and keeps unavailable salary or applicant-count fields as `NULL`.
+
 Run the tests with:
 
 ```powershell
@@ -70,7 +74,8 @@ Phase 0 provides the backend foundation. Phase 1 adds the core database
 models and migrations. Phase 2 adds deterministic candidate onboarding.
 Phase 3 adds cached GitHub project understanding. Phase 4 adds
 immutable resume version management. Agents, external integrations,
-and frontend work are planned for later phases.
+and frontend work are planned for later phases. Phase 5 adds
+adapter-ready job ingestion and deduplication.
 
 ## Tech Stack
 
