@@ -4,7 +4,7 @@
 Status: COMPLETE
 
 ## Phase 1 — Database
-Status: NOT STARTED
+Status: COMPLETE
 
 ## Phase 2 — Candidate Onboarding
 Status: NOT STARTED

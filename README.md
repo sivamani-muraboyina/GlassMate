@@ -48,8 +48,9 @@ Run the tests with:
 pytest
 ```
 
-Phase 0 provides the backend foundation only. Domain models, agents,
-external integrations, and frontend work are planned for later phases.
+Phase 0 provides the backend foundation. Phase 1 adds the core database
+models and migrations. Agents, external integrations, and frontend work
+are planned for later phases.
 
 ## Tech Stack
 
