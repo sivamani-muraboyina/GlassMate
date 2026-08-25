@@ -42,6 +42,12 @@ uvicorn app.main:app --app-dir backend --reload
 
 The health endpoint is available at `http://127.0.0.1:8000/health`.
 
+Candidate onboarding is available through:
+
+- `POST /candidates` to save a candidate profile with skills, experience,
+  education, and preferences.
+- `GET /candidates/{candidate_id}` to retrieve the saved profile.
+
 Run the tests with:
 
 ```powershell
@@ -49,8 +55,9 @@ pytest
 ```
 
 Phase 0 provides the backend foundation. Phase 1 adds the core database
-models and migrations. Agents, external integrations, and frontend work
-are planned for later phases.
+models and migrations. Phase 2 adds deterministic candidate onboarding.
+Agents, external integrations, and frontend work are planned for later
+phases.
 
 ## Tech Stack
 
