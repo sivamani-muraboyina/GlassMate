@@ -76,6 +76,10 @@ Company intelligence is available through `POST /jobs/{job_id}/company-intellige
 It stores source-labeled company information and role summaries, preferring
 `UNKNOWN` when supporting information is unavailable.
 
+Resume strategy is available through `POST /jobs/{job_id}/resume-strategy/{candidate_id}`.
+It selects the best approved resume version using deterministic requirement and
+candidate-evidence alignment, and explains near-match resume-direction recommendations.
+
 Run the tests with:
 
 ```powershell
@@ -91,7 +95,8 @@ adapter-ready job ingestion and deduplication.
 Phase 6 adds structured job analysis. Agents, external integrations, and
 frontend work are planned for later phases. Phase 7 adds deterministic job
 matching and explainable routing categories. Phase 8 adds source-aware
-company intelligence and evidence links.
+company intelligence and evidence links. Phase 9 adds deterministic resume
+selection and explainable resume strategy recommendations.
 
 ## Tech Stack
 

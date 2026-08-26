@@ -24,6 +24,7 @@ from app.schemas.resume import (
     ResumeResponse,
     ResumeVersionResponse,
 )
+from app.schemas.resume_strategy import ResumeStrategyResponse
 from app.services.candidate_onboarding import CandidateOnboardingService
 from app.services.github import GitHubRepositoryError
 from app.services.project_intelligence import ProjectIntelligenceService
@@ -32,6 +33,7 @@ from app.services.job_ingestion import JobIngestionService
 from app.services.job_analysis import JobAnalysisService
 from app.services.job_matching import JobMatchingService
 from app.services.company_intelligence import CompanyIntelligenceService
+from app.services.resume_strategy import ResumeStrategyService
 
 router = APIRouter()
 candidate_service = CandidateOnboardingService()
@@ -41,6 +43,7 @@ job_service = JobIngestionService()
 job_analysis_service = JobAnalysisService()
 job_matching_service = JobMatchingService()
 company_intelligence_service = CompanyIntelligenceService()
+resume_strategy_service = ResumeStrategyService()
 
 
 def candidate_response(candidate: Candidate) -> CandidateResponse:
@@ -209,6 +212,21 @@ def reject_resume_version(
     return transition_resume_version(
         candidate_id, resume_id, version_id, "REJECTED", session
     )
+
+
+@router.post(
+    "/jobs/{job_id}/resume-strategy/{candidate_id}",
+    response_model=ResumeStrategyResponse,
+)
+def select_resume_strategy(
+    job_id: int,
+    candidate_id: int,
+    session: Session = Depends(get_db),
+) -> ResumeStrategyResponse:
+    try:
+        return resume_strategy_service.select_resume(session, job_id, candidate_id)
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
 
 
 @router.post("/jobs/ingest", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
