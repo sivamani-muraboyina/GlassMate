@@ -84,6 +84,12 @@ Resume proposals are created through the existing resume version endpoint with
 `tex_content` and an optional `source_version_id`. Each proposal records its
 approved source version and remains `PROPOSED` until explicitly approved.
 
+Resume versions can be compiled through
+`POST /candidates/{candidate_id}/resumes/{resume_id}/versions/{version_id}/compile`.
+Compilation runs in a temporary directory with shell escape disabled and returns
+structured success, failure, or compiler-unavailable results. Install `pdflatex`
+locally to produce PDFs.
+
 Run the tests with:
 
 ```powershell
@@ -101,7 +107,8 @@ frontend work are planned for later phases. Phase 7 adds deterministic job
 matching and explainable routing categories. Phase 8 adds source-aware
 company intelligence and evidence links. Phase 9 adds deterministic resume
 selection and explainable resume strategy recommendations. Phase 10 adds
-approved-source resume proposals with provenance.
+approved-source resume proposals with provenance. Phase 11 adds sandboxed
+deterministic LaTeX compilation checks.
 
 ## Tech Stack
 

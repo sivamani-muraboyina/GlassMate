@@ -18,6 +18,7 @@ from app.schemas.job import JobIngestionRequest, JobResponse
 from app.schemas.job_analysis import JobAnalysisResponse
 from app.schemas.job_match import JobMatchRequest, JobMatchResponse, RequirementMatchResponse
 from app.schemas.company import CompanyIntelligenceRequest, CompanyIntelligenceResponse
+from app.schemas.latex import LatexCompilationResponse
 from app.schemas.resume import (
     ResumeCreateRequest,
     ResumeProposalRequest,
@@ -33,6 +34,7 @@ from app.services.job_ingestion import JobIngestionService
 from app.services.job_analysis import JobAnalysisService
 from app.services.job_matching import JobMatchingService
 from app.services.company_intelligence import CompanyIntelligenceService
+from app.services.latex_compilation import LatexCompilationService
 from app.services.resume_strategy import ResumeStrategyService
 
 router = APIRouter()
@@ -44,6 +46,7 @@ job_analysis_service = JobAnalysisService()
 job_matching_service = JobMatchingService()
 company_intelligence_service = CompanyIntelligenceService()
 resume_strategy_service = ResumeStrategyService()
+latex_compilation_service = LatexCompilationService()
 
 
 def candidate_response(candidate: Candidate) -> CandidateResponse:
@@ -214,6 +217,26 @@ def reject_resume_version(
     return transition_resume_version(
         candidate_id, resume_id, version_id, "REJECTED", session
     )
+
+
+@router.post(
+    "/candidates/{candidate_id}/resumes/{resume_id}/versions/{version_id}/compile",
+    response_model=LatexCompilationResponse,
+)
+def compile_resume_version(
+    candidate_id: int,
+    resume_id: int,
+    version_id: int,
+    session: Session = Depends(get_db),
+) -> LatexCompilationResponse:
+    try:
+        return latex_compilation_service.compile_version(
+            session, candidate_id, resume_id, version_id
+        )
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
 
 
 @router.post(
