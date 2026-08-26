@@ -96,6 +96,12 @@ the selected resume version, job snapshot, match score, supplied materials, and
 source without submitting to an external platform. An `idempotency_key` makes
 retries return the existing package.
 
+Application packages can be reviewed through
+`POST /candidates/{candidate_id}/applications/{application_id}/critic`.
+The deterministic critic checks resume usability, material claim references,
+claim verification, required job coverage, and package completeness, returning
+structured `PASS` or `FAIL` findings without mutating the package.
+
 Run the tests with:
 
 ```powershell
@@ -115,7 +121,8 @@ company intelligence and evidence links. Phase 9 adds deterministic resume
 selection and explainable resume strategy recommendations. Phase 10 adds
 approved-source resume proposals with provenance. Phase 11 adds sandboxed
 deterministic LaTeX compilation checks. Phase 12 adds application package
-preparation and job snapshots.
+preparation and job snapshots. Phase 13 adds deterministic critic validation
+with structured findings.
 
 ## Tech Stack
 

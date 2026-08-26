@@ -19,6 +19,7 @@ from app.schemas.job_analysis import JobAnalysisResponse
 from app.schemas.job_match import JobMatchRequest, JobMatchResponse, RequirementMatchResponse
 from app.schemas.company import CompanyIntelligenceRequest, CompanyIntelligenceResponse
 from app.schemas.application import ApplicationPreparationRequest, ApplicationResponse
+from app.schemas.critic import CriticResponse
 from app.schemas.latex import LatexCompilationResponse
 from app.schemas.resume import (
     ResumeCreateRequest,
@@ -37,6 +38,7 @@ from app.services.job_matching import JobMatchingService
 from app.services.company_intelligence import CompanyIntelligenceService
 from app.services.latex_compilation import LatexCompilationService
 from app.services.application_preparation import ApplicationPreparationService
+from app.services.critic import CriticService
 from app.services.resume_strategy import ResumeStrategyService
 
 router = APIRouter()
@@ -50,6 +52,7 @@ company_intelligence_service = CompanyIntelligenceService()
 resume_strategy_service = ResumeStrategyService()
 latex_compilation_service = LatexCompilationService()
 application_service = ApplicationPreparationService()
+critic_service = CriticService()
 
 
 def candidate_response(candidate: Candidate) -> CandidateResponse:
@@ -275,6 +278,21 @@ def prepare_application(
             for material in application.materials
         ],
     )
+
+
+@router.post(
+    "/candidates/{candidate_id}/applications/{application_id}/critic",
+    response_model=CriticResponse,
+)
+def review_application(
+    candidate_id: int,
+    application_id: int,
+    session: Session = Depends(get_db),
+) -> CriticResponse:
+    try:
+        return critic_service.review(session, candidate_id, application_id)
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
 
 
 @router.post(
