@@ -129,6 +129,8 @@ MCP adapters. Phase 16 adds a typed, permission-gated Gmail service boundary
 for search, thread reads, drafts, and approved sends. Phase 17 adds a
 duplicate-safe Calendar follow-up service boundary. Phase 18 adds a
 compliant application execution boundary with approval and handoff safeguards.
+Phase 19 adds dependency-free evaluation metrics and a labeled requirement
+classification fixture.
 
 ## Tech Stack
 

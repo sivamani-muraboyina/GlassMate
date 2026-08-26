@@ -1,0 +1,6 @@
+[
+  {"expected": "SUPPORTED", "predicted": "SUPPORTED"},
+  {"expected": "PARTIALLY_SUPPORTED", "predicted": "SUPPORTED"},
+  {"expected": "NOT_SUPPORTED", "predicted": "NOT_SUPPORTED"},
+  {"expected": "UNKNOWN", "predicted": "UNKNOWN"}
+]
