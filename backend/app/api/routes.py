@@ -18,6 +18,7 @@ from app.schemas.job import JobIngestionRequest, JobResponse
 from app.schemas.job_analysis import JobAnalysisResponse
 from app.schemas.job_match import JobMatchRequest, JobMatchResponse, RequirementMatchResponse
 from app.schemas.company import CompanyIntelligenceRequest, CompanyIntelligenceResponse
+from app.schemas.application import ApplicationPreparationRequest, ApplicationResponse
 from app.schemas.latex import LatexCompilationResponse
 from app.schemas.resume import (
     ResumeCreateRequest,
@@ -35,6 +36,7 @@ from app.services.job_analysis import JobAnalysisService
 from app.services.job_matching import JobMatchingService
 from app.services.company_intelligence import CompanyIntelligenceService
 from app.services.latex_compilation import LatexCompilationService
+from app.services.application_preparation import ApplicationPreparationService
 from app.services.resume_strategy import ResumeStrategyService
 
 router = APIRouter()
@@ -47,6 +49,7 @@ job_matching_service = JobMatchingService()
 company_intelligence_service = CompanyIntelligenceService()
 resume_strategy_service = ResumeStrategyService()
 latex_compilation_service = LatexCompilationService()
+application_service = ApplicationPreparationService()
 
 
 def candidate_response(candidate: Candidate) -> CandidateResponse:
@@ -237,6 +240,41 @@ def compile_resume_version(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+
+
+@router.post(
+    "/candidates/{candidate_id}/jobs/{job_id}/applications",
+    response_model=ApplicationResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def prepare_application(
+    candidate_id: int,
+    job_id: int,
+    request: ApplicationPreparationRequest,
+    session: Session = Depends(get_db),
+) -> ApplicationResponse:
+    try:
+        application = application_service.prepare(session, candidate_id, job_id, request)
+    except LookupError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+    return ApplicationResponse(
+        id=application.id,
+        job_id=application.job_id,
+        candidate_id=application.candidate_id,
+        resume_version_id=application.resume_version_id,
+        mode=application.mode,
+        status=application.status,
+        job_url=application.job_url_snapshot,
+        job_description=application.jd_snapshot,
+        match_score=application.match_score,
+        source=application.source,
+        materials=[
+            {"id": material.id, "material_type": material.material_type, "content": material.content, "claims": material.claims}
+            for material in application.materials
+        ],
+    )
 
 
 @router.post(

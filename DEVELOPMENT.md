@@ -37,7 +37,7 @@ Status: COMPLETE
 Status: COMPLETE
 
 ## Phase 12 — Application Preparation
-Status: NOT STARTED
+Status: COMPLETE
 
 ## Phase 13 — Critic
 Status: NOT STARTED

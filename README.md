@@ -90,6 +90,12 @@ Compilation runs in a temporary directory with shell escape disabled and returns
 structured success, failure, or compiler-unavailable results. Install `pdflatex`
 locally to produce PDFs.
 
+Application packages can be prepared through
+`POST /candidates/{candidate_id}/jobs/{job_id}/applications`. The endpoint stores
+the selected resume version, job snapshot, match score, supplied materials, and
+source without submitting to an external platform. An `idempotency_key` makes
+retries return the existing package.
+
 Run the tests with:
 
 ```powershell
@@ -108,7 +114,8 @@ matching and explainable routing categories. Phase 8 adds source-aware
 company intelligence and evidence links. Phase 9 adds deterministic resume
 selection and explainable resume strategy recommendations. Phase 10 adds
 approved-source resume proposals with provenance. Phase 11 adds sandboxed
-deterministic LaTeX compilation checks.
+deterministic LaTeX compilation checks. Phase 12 adds application package
+preparation and job snapshots.
 
 ## Tech Stack
 

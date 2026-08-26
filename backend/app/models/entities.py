@@ -308,6 +308,10 @@ class Application(Base, TimestampMixin):
     status: Mapped[ApplicationStatus] = mapped_column(Enum(ApplicationStatus), default=ApplicationStatus.DISCOVERED)
     applied_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     idempotency_key: Mapped[str | None] = mapped_column(String(200), unique=True)
+    job_url_snapshot: Mapped[str] = mapped_column(String(1000), default="")
+    jd_snapshot: Mapped[str] = mapped_column(Text, default="")
+    match_score: Mapped[float | None]
+    source: Mapped[str] = mapped_column(String(100), default="")
 
     materials: Mapped[list["ApplicationMaterial"]] = relationship(back_populates="application", cascade="all, delete-orphan")
     follow_ups: Mapped[list["FollowUp"]] = relationship(back_populates="application", cascade="all, delete-orphan")
