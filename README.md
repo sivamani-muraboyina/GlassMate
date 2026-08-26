@@ -125,7 +125,8 @@ preparation and job snapshots. Phase 13 adds deterministic critic validation
 with structured findings. Phase 14 adds an explicit deterministic workflow
 registry with persisted agent-run lifecycle and failure results.
 Phase 15 adds a controlled tool registry with agent-scoped access for future
-MCP adapters.
+MCP adapters. Phase 16 adds a typed, permission-gated Gmail service boundary
+for search, thread reads, drafts, and approved sends.
 
 ## Tech Stack
 
