@@ -124,6 +124,8 @@ deterministic LaTeX compilation checks. Phase 12 adds application package
 preparation and job snapshots. Phase 13 adds deterministic critic validation
 with structured findings. Phase 14 adds an explicit deterministic workflow
 registry with persisted agent-run lifecycle and failure results.
+Phase 15 adds a controlled tool registry with agent-scoped access for future
+MCP adapters.
 
 ## Tech Stack
 

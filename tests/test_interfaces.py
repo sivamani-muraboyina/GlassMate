@@ -5,6 +5,7 @@ from app.agents.base import AgentContext
 from app.db.base import Base
 from app.models import AgentRun, AgentRunStatus
 from app.orchestrator.base import Orchestrator, WorkflowRequest
+from app.tools.base import ScopedToolRegistry, Tool, ToolRegistry
 import app.models.entities  # noqa: F401
 
 
@@ -80,3 +81,34 @@ def test_agent_context_is_typed_data() -> None:
 
     assert context.workflow_id == "workflow-1"
     assert context.inputs["value"] == 1
+
+
+class EchoTool(Tool):
+    name = "echo"
+
+    def execute(self, arguments: dict[str, object]) -> dict[str, object]:
+        return arguments
+
+
+class PrivateTool(Tool):
+    name = "private"
+
+    def execute(self, arguments: dict[str, object]) -> dict[str, object]:
+        return arguments
+
+
+def test_tool_registry_scopes_agent_access() -> None:
+    registry = ToolRegistry([EchoTool(), PrivateTool()])
+    scoped = registry.scope(["echo"])
+
+    assert isinstance(scoped, ScopedToolRegistry)
+    assert registry.names() == ("echo", "private")
+    assert scoped.names() == ("echo",)
+    assert scoped.execute("echo", {"value": 1}) == {"value": 1}
+
+    try:
+        scoped.execute("private", {})
+    except PermissionError as error:
+        assert str(error) == "Tool 'private' is not available in this scope"
+    else:
+        raise AssertionError("Expected scoped access to reject unavailable tools")
