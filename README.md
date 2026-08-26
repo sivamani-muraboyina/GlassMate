@@ -122,7 +122,8 @@ selection and explainable resume strategy recommendations. Phase 10 adds
 approved-source resume proposals with provenance. Phase 11 adds sandboxed
 deterministic LaTeX compilation checks. Phase 12 adds application package
 preparation and job snapshots. Phase 13 adds deterministic critic validation
-with structured findings.
+with structured findings. Phase 14 adds an explicit deterministic workflow
+registry with persisted agent-run lifecycle and failure results.
 
 ## Tech Stack
 
