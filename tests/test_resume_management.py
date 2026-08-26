@@ -46,6 +46,7 @@ def test_resume_versions_preserve_approval_history(database: Session) -> None:
     assert resume.versions[0].status == ResumeVersionStatus.APPROVED
     assert resume.versions[0].tex_content == "approved source"
     assert proposal.version_number == 2
+    assert proposal.source_version_id == resume.versions[0].id
     assert approved.status == ResumeVersionStatus.APPROVED
     assert approved.tex_content == "proposed source"
 
@@ -56,6 +57,40 @@ def test_resume_versions_preserve_approval_history(database: Session) -> None:
             resume.id,
             proposal.id,
             ResumeVersionStatus.REJECTED,
+        )
+
+
+def test_proposal_requires_approved_source_version(database: Session) -> None:
+    candidate = Candidate(full_name="Test Candidate")
+    database.add(candidate)
+    database.commit()
+    service = ResumeManagementService()
+    resume = service.create_approved_resume(
+        database,
+        candidate.id,
+        ResumeCreateRequest(name="General", tex_content="approved source"),
+    )
+    proposal = service.create_proposal(
+        database,
+        candidate.id,
+        resume.id,
+        ResumeProposalRequest(tex_content="first proposal"),
+    )
+
+    with pytest.raises(ValueError, match="approved"):
+        service.create_proposal(
+            database,
+            candidate.id,
+            resume.id,
+            ResumeProposalRequest(tex_content="second proposal", source_version_id=proposal.id),
+        )
+
+    with pytest.raises(LookupError, match="Resume version 999"):
+        service.create_proposal(
+            database,
+            candidate.id,
+            resume.id,
+            ResumeProposalRequest(tex_content="second proposal", source_version_id=999),
         )
 
 

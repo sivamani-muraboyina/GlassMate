@@ -195,11 +195,18 @@ class ResumeVersion(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     resume_id: Mapped[int] = mapped_column(ForeignKey("resumes.id", ondelete="CASCADE"))
+    source_version_id: Mapped[int | None] = mapped_column(ForeignKey("resume_versions.id"))
     version_number: Mapped[int] = mapped_column(Integer)
     status: Mapped[ResumeVersionStatus] = mapped_column(Enum(ResumeVersionStatus), default=ResumeVersionStatus.PROPOSED)
     tex_content: Mapped[str] = mapped_column(Text)
 
     resume: Mapped[Resume] = relationship(back_populates="versions")
+    source_version: Mapped["ResumeVersion | None"] = relationship(
+        remote_side="ResumeVersion.id", back_populates="derived_versions"
+    )
+    derived_versions: Mapped[list["ResumeVersion"]] = relationship(
+        back_populates="source_version"
+    )
 
 
 class Company(Base, TimestampMixin):

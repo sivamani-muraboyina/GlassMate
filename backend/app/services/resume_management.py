@@ -31,9 +31,11 @@ class ResumeManagementService:
         self, session: Session, candidate_id: int, resume_id: int, request: ResumeProposalRequest
     ) -> ResumeVersion:
         resume = self._get_owned_resume(session, candidate_id, resume_id)
+        source_version = self._source_version(resume, request.source_version_id)
         next_number = max((version.version_number for version in resume.versions), default=0) + 1
         proposal = ResumeVersion(
             resume_id=resume.id,
+            source_version_id=source_version.id,
             version_number=next_number,
             status=ResumeVersionStatus.PROPOSED,
             tex_content=request.tex_content,
@@ -42,6 +44,24 @@ class ResumeManagementService:
         session.commit()
         session.refresh(proposal)
         return proposal
+
+    @staticmethod
+    def _source_version(resume: Resume, source_version_id: int | None) -> ResumeVersion:
+        approved_versions = [
+            version for version in resume.versions if version.status == ResumeVersionStatus.APPROVED
+        ]
+        if source_version_id is None:
+            if not approved_versions:
+                raise ValueError("A proposal requires an approved source resume version")
+            return max(approved_versions, key=lambda version: version.version_number)
+        source_version = next(
+            (version for version in resume.versions if version.id == source_version_id), None
+        )
+        if source_version is None:
+            raise LookupError(f"Resume version {source_version_id} was not found")
+        if source_version.status != ResumeVersionStatus.APPROVED:
+            raise ValueError("A proposal source must be an approved resume version")
+        return source_version
 
     def transition_version(
         self,

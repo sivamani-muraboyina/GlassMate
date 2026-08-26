@@ -80,6 +80,10 @@ Resume strategy is available through `POST /jobs/{job_id}/resume-strategy/{candi
 It selects the best approved resume version using deterministic requirement and
 candidate-evidence alignment, and explains near-match resume-direction recommendations.
 
+Resume proposals are created through the existing resume version endpoint with
+`tex_content` and an optional `source_version_id`. Each proposal records its
+approved source version and remains `PROPOSED` until explicitly approved.
+
 Run the tests with:
 
 ```powershell
@@ -96,7 +100,8 @@ Phase 6 adds structured job analysis. Agents, external integrations, and
 frontend work are planned for later phases. Phase 7 adds deterministic job
 matching and explainable routing categories. Phase 8 adds source-aware
 company intelligence and evidence links. Phase 9 adds deterministic resume
-selection and explainable resume strategy recommendations.
+selection and explainable resume strategy recommendations. Phase 10 adds
+approved-source resume proposals with provenance.
 
 ## Tech Stack
 

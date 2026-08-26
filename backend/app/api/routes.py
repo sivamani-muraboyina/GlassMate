@@ -161,6 +161,8 @@ def create_resume_proposal(
         version = resume_service.create_proposal(session, candidate_id, resume_id, request)
     except LookupError as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
     return ResumeVersionResponse.model_validate(version, from_attributes=True)
 
 
