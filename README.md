@@ -126,7 +126,8 @@ with structured findings. Phase 14 adds an explicit deterministic workflow
 registry with persisted agent-run lifecycle and failure results.
 Phase 15 adds a controlled tool registry with agent-scoped access for future
 MCP adapters. Phase 16 adds a typed, permission-gated Gmail service boundary
-for search, thread reads, drafts, and approved sends.
+for search, thread reads, drafts, and approved sends. Phase 17 adds a
+duplicate-safe Calendar follow-up service boundary.
 
 ## Tech Stack
 
