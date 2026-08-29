@@ -1,4 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
+import ReactDOM from 'react-dom/client'
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -493,3 +494,5 @@ function App() {
 }
 
 export default App
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />)
