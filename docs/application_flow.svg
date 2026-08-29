@@ -1,0 +1,111 @@
+<!DOCTYPE svg>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="mermaid">
+graph LR
+    subgraph "Phase 1: Candidate Setup"
+        A1["User Profile<br/>Name, Email"]
+        A2["Skills & Experience<br/>Validated, Stored"]
+        A3["GitHub Projects<br/>Imported, Cached"]
+        A4["Approved Resumes<br/>≥3 versions"]
+        A1 --> A2 --> A3 --> A4
+    end
+
+    subgraph "Phase 2: Job Discovery"
+        B1["Job Posting<br/>Raw Input"]
+        B2["Deterministic:<br/>Dedup, Normalize"]
+        B3["LLM: JobAnalysis<br/>Extract Requirements<br/>REQUIRED/PREFERRED"]
+        B4["Job Stored<br/>with Classification"]
+        B1 --> B2 --> B3 --> B4
+    end
+
+    subgraph "Phase 3: Job-Candidate Matching"
+        C1["Load Job<br/>& Candidate"]
+        C2["LLM: Semantic Analysis<br/>Skills vs Requirements"]
+        C3["Deterministic:<br/>Classify Each Req<br/>SUPPORTED/PARTIAL/NOT/UNKNOWN"]
+        C4["Deterministic:<br/>Calculate Score<br/>Weighted by Tier"]
+        C5["Route to Category<br/>STRONG/NEAR/POOR"]
+        C1 --> C2 --> C3 --> C4 --> C5
+    end
+
+    subgraph "Phase 4: Intelligence"
+        D1["LLM: CompanyAnalysis<br/>from Job Listing"]
+        D2["LLM: ProjectIntel<br/>GitHub Repos"]
+        D3["Store Sourced Info<br/>VERIFIED/INFERRED"]
+        D1 --> D3
+        D2 --> D3
+    end
+
+    subgraph "Phase 5: Resume Strategy"
+        E1["For STRONG_MATCH<br/>or NEAR_MATCH"]
+        E2["Best Resume Identified<br/>Deterministic"]
+        E3["LLM: Propose Direction<br/>Tailored to Job"]
+        E4["LLM: Generate Proposal<br/>Evidence-backed"]
+        E5["Proposal: PROPOSED<br/>Awaiting Approval"]
+        E1 --> E2 --> E3 --> E4 --> E5
+    end
+
+    subgraph "Phase 6: Validation"
+        F1["User Reviews<br/>Proposal"]
+        F2["LLM: Critic Agent<br/>Checks Completeness<br/>Verifies Evidence"]
+        F3["Critic: PASS or FAIL<br/>with Findings"]
+        F4["Max 3 Revisions<br/>Prevent Loops"]
+        F1 --> F2 --> F3 --> F4
+    end
+
+    subgraph "Phase 7: Application Prep"
+        G1["User Approval<br/>Resume + Job"]
+        G2["Deterministic:<br/>Package Materials<br/>Resume + Job Snapshot"]
+        G3["Immutable<br/>Application Record<br/>Match Score Captured"]
+        G1 --> G2 --> G3
+    end
+
+    subgraph "Phase 8: Submission"
+        H1["Application Mode<br/>PREPARE / APPROVAL<br/>/ AUTO_APPLY"]
+        H2["PREPARE: User submits<br/>APPROVAL: Show + confirm<br/>AUTO_APPLY: Execute"]
+        H3["Timestamp recorded<br/>Status: APPLIED"]
+        H1 --> H2 --> H3
+    end
+
+    subgraph "Phase 9: Tracking"
+        I1["Track Status<br/>DISCOVERED→APPLIED<br/>→INTERVIEW→etc."]
+        I2["Optional: Calendar<br/>Follow-up Reminders"]
+        I3["Optional: Gmail<br/>Recruiter Responses"]
+        I4["Full Audit Trail<br/>Decisions & Changes"]
+        I1 --> I2 --> I3 --> I4
+    end
+
+    A4 --> B1
+    B4 --> C1
+    C5 --> D1
+    D3 --> E1
+    E5 --> F1
+    F4 --> G1
+    G3 --> H1
+    H3 --> I1
+
+    classDef setupStyle fill:#c8e6c9
+    classDef discoveryStyle fill:#bbdefb
+    classDef matchStyle fill:#fff9c4
+    classDef intelStyle fill:#f8bbd0
+    classDef strategyStyle fill:#ffe0b2
+    classDef validationStyle fill:#ffccbc
+    classDef prepStyle fill:#d1c4e9
+    classDef submitStyle fill:#b2ebf2
+    classDef trackStyle fill:#c5cae9
+
+    class A1,A2,A3,A4 setupStyle
+    class B1,B2,B3,B4 discoveryStyle
+    class C1,C2,C3,C4,C5 matchStyle
+    class D1,D2,D3 intelStyle
+    class E1,E2,E3,E4,E5 strategyStyle
+    class F1,F2,F3,F4 validationStyle
+    class G1,G2,G3 prepStyle
+    class H1,H2,H3 submitStyle
+    class I1,I2,I3,I4 trackStyle
+    </div>
+</body>
+</html>

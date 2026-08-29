@@ -1,0 +1,210 @@
+<!DOCTYPE svg>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="mermaid">
+erDiagram
+
+    CANDIDATE ||--o{ CANDIDATE_SKILL : has
+    CANDIDATE ||--o{ EXPERIENCE : has
+    CANDIDATE ||--o{ EDUCATION : has
+    CANDIDATE ||--o{ PROJECT : has
+    CANDIDATE ||--o{ RESUME : owns
+    CANDIDATE ||--o{ PREFERENCE : sets
+    CANDIDATE ||--o{ APPLICATION : initiates
+
+    PROJECT ||--o{ PROJECT_EVIDENCE : has
+    PROJECT ||--o{ EVIDENCE : references
+
+    RESUME ||--o{ RESUME_VERSION : contains
+    RESUME_VERSION ||--o{ APPLICATION : used_in
+
+    JOB ||--o{ JOB_REQUIREMENT : has
+    JOB ||--o{ JOB_MATCH : matched_in
+    JOB ||--o{ COMPANY : posted_by
+    JOB ||--o{ APPLICATION : associated_with
+
+    COMPANY ||--o{ EVIDENCE : sources
+
+    JOB_REQUIREMENT ||--o{ JOB_REQUIREMENT_MATCH : classified_as
+
+    APPLICATION ||--o{ APPLICATION_MATERIAL : contains
+    APPLICATION ||--o{ FOLLOW_UP : tracks
+    APPLICATION ||--o{ EMAIL_INTERACTION : communicates
+
+    AGENT_RUN ||--o{ AGENT_RUN : logs_for
+
+    EVIDENCE ||--o{ CLAIM : supports
+
+    CANDIDATE_SKILL {
+        int id PK
+        int candidate_id FK
+        string skill
+        string proficiency
+    }
+
+    EXPERIENCE {
+        int id PK
+        int candidate_id FK
+        string employer
+        string title
+        date start_date
+        date end_date
+        text description
+    }
+
+    EDUCATION {
+        int id PK
+        int candidate_id FK
+        string institution
+        string degree
+        string field
+    }
+
+    EVIDENCE {
+        int id PK
+        string type "GITHUB|RESUME|PROFILE|etc"
+        text content
+        string status "VERIFIED|INFERRED|UNKNOWN"
+        timestamp created_at
+    }
+
+    PROJECT {
+        int id PK
+        int candidate_id FK
+        string repo_url
+        string name
+        text description
+        string technologies
+        text architecture_summary
+    }
+
+    PROJECT_EVIDENCE {
+        int id PK
+        int project_id FK
+        int evidence_id FK
+    }
+
+    RESUME {
+        int id PK
+        int candidate_id FK
+        string name
+        timestamp created_at
+    }
+
+    RESUME_VERSION {
+        int id PK
+        int resume_id FK
+        int version_number
+        string status "PROPOSED|APPROVED|REJECTED"
+        text content_latex
+        text content_plain
+        timestamp created_at
+    }
+
+    JOB {
+        int id PK
+        string title
+        string company_name
+        text description
+        string source_url
+        string fingerprint "dedup key"
+        timestamp discovered_at
+    }
+
+    COMPANY {
+        int id PK
+        string name
+        string fingerprint "dedup key"
+        text summary
+        string size
+        string funding_stage
+        string status "VERIFIED|INFERRED|UNKNOWN"
+    }
+
+    JOB_REQUIREMENT {
+        int id PK
+        int job_id FK
+        string requirement_text
+        string tier "REQUIRED|PREFERRED|RESPONSIBILITY|OTHER"
+    }
+
+    JOB_REQUIREMENT_MATCH {
+        int id PK
+        int job_id FK
+        int requirement_id FK
+        int candidate_id FK
+        string classification "SUPPORTED|PARTIAL|NOT_SUPPORTED|UNKNOWN"
+        string reasoning
+    }
+
+    JOB_MATCH {
+        int id PK
+        int job_id FK
+        int candidate_id FK
+        int score "0-100"
+        string category "STRONG_MATCH|NEAR_MATCH|POOR_MATCH"
+        timestamp calculated_at
+    }
+
+    APPLICATION {
+        int id PK
+        int candidate_id FK
+        int job_id FK
+        int resume_version_id FK
+        string mode "PREPARE|APPROVAL_REQUIRED|AUTO_APPLY"
+        string status "DISCOVERED|APPLIED|INTERVIEW|REJECTED|OFFER|etc"
+        int match_score_snapshot
+        timestamp applied_at
+    }
+
+    APPLICATION_MATERIAL {
+        int id PK
+        int application_id FK
+        string type "RESUME|COVER_LETTER|etc"
+        text content
+    }
+
+    FOLLOW_UP {
+        int id PK
+        int application_id FK
+        date follow_up_date
+        string action "EMAIL|CALL|LINKEDIN|etc"
+    }
+
+    EMAIL_INTERACTION {
+        int id PK
+        int application_id FK
+        string from_addr
+        string subject
+        timestamp received_at
+    }
+
+    PREFERENCE {
+        int id PK
+        int candidate_id FK
+        string key
+        string value
+    }
+
+    CLAIM {
+        int id PK
+        text content
+        string status "SUPPORTED|UNSUPPORTED|UNKNOWN"
+    }
+
+    AGENT_RUN {
+        int id PK
+        string agent_name
+        string workflow_name
+        string status "STARTED|SUCCEEDED|FAILED"
+        json input_data
+        json output_data
+        text error_message
+        timestamp created_at
+    }
+    </div>
+</body>
+</html>

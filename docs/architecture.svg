@@ -1,0 +1,91 @@
+<!DOCTYPE svg>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="mermaid">
+graph TB
+    subgraph "Client Layer"
+        User["👤 User / Recruiter"]
+    end
+
+    subgraph "Frontend Layer"
+        React["React Dashboard<br/>(Port 3000/5173)<br/>Vite build"]
+    end
+
+    subgraph "Backend API Layer"
+        FastAPI["FastAPI<br/>(Port 8000)<br/>18 REST Endpoints"]
+    end
+
+    subgraph "Orchestration Layer"
+        Orch["Orchestrator<br/>Workflow Registry<br/>AgentRun Persistence"]
+    end
+
+    subgraph "Services Layer - Deterministic"
+        S1["CandidateOnboarding<br/>Validation, Persistence"]
+        S2["JobIngestion<br/>Dedup, Normalize"]
+        S3["JobMatching<br/>Scoring, Classify"]
+        S4["ResumeManagement<br/>Version, Immutability"]
+        S5["ApplicationPrep<br/>Package, Snapshot"]
+        S6["LaTeX Compilation<br/>Sandboxed Build"]
+    end
+
+    subgraph "Services Layer - AI/LLM"
+        L1["JobAnalysis<br/>Requirement Extract"]
+        L2["ProjectIntelligence<br/>GitHub Understanding"]
+        L3["CompanyIntelligence<br/>Structured Synthesis"]
+        L4["ResumeStrategy<br/>Proposal Generate"]
+        L5["Critic<br/>Validation"]
+        L6["Gmail<br/>Email Mgmt"]
+        L7["Calendar<br/>Follow-ups"]
+    end
+
+    subgraph "Tool/MCP Layer"
+        GitHub["GitHub API<br/>Public Repos"]
+        GmailAPI["Gmail API<br/>Search, Read, Draft, Send"]
+        CalendarAPI["Calendar API<br/>Event Create"]
+        LLMProvider["LLM Provider<br/>Abstraction<br/>OpenAI, Anthropic, etc."]
+    end
+
+    subgraph "Database Layer"
+        PostgreSQL["PostgreSQL 16+<br/>Alembic Migrations<br/>7 versions"]
+        Tables["Candidate | Evidence<br/>Project | Resume<br/>Job | Company<br/>Application | Match<br/>AgentRun"]
+    end
+
+    User --> React
+    React --> FastAPI
+    FastAPI --> Orch
+    Orch --> S1 & S2 & S3 & S4 & S5 & S6
+    Orch --> L1 & L2 & L3 & L4 & L5 & L6 & L7
+    
+    S1 & S2 & S3 & S4 & S5 & S6 --> PostgreSQL
+    L1 & L2 & L3 & L4 & L5 & L6 & L7 --> PostgreSQL
+    
+    L1 & L2 & L3 & L4 & L5 --> LLMProvider
+    L2 --> GitHub
+    L6 --> GmailAPI
+    L7 --> CalendarAPI
+    
+    PostgreSQL --> Tables
+    
+    classDef userLayer fill:#e1f5ff
+    classDef frontendLayer fill:#b3e5fc
+    classDef apiLayer fill:#81d4fa
+    classDef orchLayer fill:#ffb74d
+    classDef detLayer fill:#c8e6c9
+    classDef llmLayer fill:#f8bbd0
+    classDef toolLayer fill:#e1bee7
+    classDef dbLayer fill:#cfd8dc
+    
+    class User userLayer
+    class React frontendLayer
+    class FastAPI apiLayer
+    class Orch orchLayer
+    class S1,S2,S3,S4,S5,S6 detLayer
+    class L1,L2,L3,L4,L5,L6,L7 llmLayer
+    class GitHub,GmailAPI,CalendarAPI,LLMProvider toolLayer
+    class PostgreSQL,Tables dbLayer
+    </div>
+</body>
+</html>

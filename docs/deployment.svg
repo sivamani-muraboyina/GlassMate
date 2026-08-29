@@ -1,0 +1,107 @@
+<!DOCTYPE svg>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="mermaid">
+graph TB
+    subgraph "Developer Workstation (Local)"
+        Git["Git Repository<br/>Code + Config"]
+        Env1[".env File<br/>Local secrets"]
+        DC["docker compose up<br/>(from Compose file)"]
+    end
+
+    subgraph "Docker Compose Orchestration (Local / VM)"
+        Network["Docker Network<br/>glassmate"]
+        
+        subgraph "Backend Container"
+            PyImage["Image: python:3.12-slim"]
+            App["FastAPI App<br/>app.main:app"]
+            Uvicorn["uvicorn<br/>0.0.0.0:8000"]
+            HealthBE["Health Check<br/>GET /health"]
+        end
+
+        subgraph "Frontend Container"
+            NodeImage["Image: node:24-alpine<br/>Multi-stage Build"]
+            ViteB["Vite Build<br/>(npm run build)"]
+            Serve["serve<br/>-l 3000"]
+            HealthFE["Health Check<br/>GET / 200"]
+        end
+
+        subgraph "Database Container"
+            PgImage["Image: postgres:16-alpine"]
+            PgPort["Port 5432<br/>(internal)"]
+            PgVolume["Volume:<br/>glassmate_postgres_data"]
+            HealthDB["Health Check<br/>pg_isready"]
+        end
+    end
+
+    subgraph "Environment Configuration"
+        Vars["DATABASE_URL<br/>POSTGRES_USER/PASSWORD/DB<br/>VITE_API_URL<br/>ENVIRONMENT<br/>LOG_LEVEL<br/>NODE_ENV"]
+    end
+
+    subgraph "External Services (Optional)"
+        GitHub1["GitHub API<br/>Public Repos"]
+        Gmail1["Gmail API<br/>OAuth Setup"]
+        Calendar1["Google Calendar<br/>OAuth Setup"]
+    end
+
+    subgraph "CI/CD Pipeline (GitHub Actions)"
+        CI["Trigger: push to main<br/>or PR"]
+        BackendTest["Backend Job:<br/>pytest -v<br/>PostgreSQL:16-alpine"]
+        FrontendBuild["Frontend Job:<br/>npm ci<br/>npm run build"]
+        Results["Results: Pass/Fail<br/>Commit Status"]
+    end
+
+    Git --> DC
+    Env1 --> DC
+    DC --> Network
+    
+    Network --> PyImage
+    Network --> NodeImage
+    Network --> PgImage
+    
+    PyImage --> App --> Uvicorn --> HealthBE
+    NodeImage --> ViteB --> Serve --> HealthFE
+    PgImage --> PgPort
+    PgPort --> PgVolume
+    PgImage --> HealthDB
+    
+    App -.-> PgPort
+    Uvicorn -.-> HealthDB
+    Serve -.-> Uvicorn
+    
+    Vars -.-> App
+    Vars -.-> Uvicorn
+    Vars -.-> ViteB
+    Vars -.-> Serve
+    
+    App -.-> GitHub1
+    App -.-> Gmail1
+    App -.-> Calendar1
+    
+    Git --> CI
+    CI --> BackendTest
+    CI --> FrontendBuild
+    BackendTest --> Results
+    FrontendBuild --> Results
+
+    classDef dev fill:#e8f5e9
+    classDef compose fill:#bbdefb
+    classDef container fill:#b3e5fc
+    classDef services fill:#fff9c4
+    classDef config fill:#f8bbd0
+    classDef external fill:#ffe0b2
+    classDef ci fill:#ffccbc
+
+    class Git,Env1,DC dev
+    class Network compose
+    class PyImage,NodeImage,PgImage,App,Uvicorn,ViteB,Serve,PgPort,PgVolume container
+    class HealthBE,HealthFE,HealthDB services
+    class Vars config
+    class GitHub1,Gmail1,Calendar1 external
+    class CI,BackendTest,FrontendBuild,Results ci
+    </div>
+</body>
+</html>
