@@ -102,6 +102,17 @@ The deterministic critic checks resume usability, material claim references,
 claim verification, required job coverage, and package completeness, returning
 structured `PASS` or `FAIL` findings without mutating the package.
 
+A frontend shell for the GlassMate workflow is available under `frontend/`.
+The current Phase 20 implementation includes a responsive product dashboard for
+candidate readiness, active jobs, resume strategy, and application tracking.
+Run the frontend with:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
 Run the tests with:
 
 ```powershell
