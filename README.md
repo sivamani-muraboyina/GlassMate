@@ -18,6 +18,30 @@ and follow-ups.
 
 Defined in `ARCHITECTURE_DECISIONS.md`.
 
+## Quick Start with Docker Compose
+
+The fastest way to run GlassMate locally:
+
+```bash
+# Clone the repository
+git clone https://github.com/sivamani-muraboyina/GlassMate.git
+cd GlassMate
+
+# Copy environment configuration
+cp .env.example .env
+
+# Start all services (PostgreSQL, backend, frontend)
+docker compose up
+
+# In another terminal, run database migrations
+docker compose exec backend alembic upgrade head
+```
+
+Then open your browser:
+
+- Frontend: http://localhost:3000
+- Backend health: http://localhost:8000/health
+
 ## Local Setup
 
 Requirements:
@@ -34,7 +58,15 @@ python -m pip install -e ".[test]"
 ```
 
 Copy `.env.example` to `.env` and update `DATABASE_URL` for your local
-PostgreSQL instance. Start the API with:
+PostgreSQL instance.
+
+Run database migrations:
+
+```powershell
+alembic upgrade head
+```
+
+Start the API with:
 
 ```powershell
 uvicorn app.main:app --app-dir backend --reload

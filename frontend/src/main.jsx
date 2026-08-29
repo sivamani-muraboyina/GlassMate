@@ -21,6 +21,10 @@ import {
 } from 'lucide-react'
 import './styles.css'
 
+// Backend API URL: configurable via VITE_API_URL environment variable
+// Defaults to localhost development address
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
+
 const navItems = ['Overview', 'Candidate', 'Jobs', 'Resumes', 'Applications']
 
 const seedData = {
@@ -122,12 +126,12 @@ function App() {
       setError('')
 
       try {
-        const response = await fetch('http://127.0.0.1:8000/health')
+        const response = await fetch(`${API_URL}/health`)
         if (!response.ok) {
           throw new Error('Backend unavailable')
         }
 
-        const candidateResponse = await fetch('http://127.0.0.1:8000/candidates/1')
+        const candidateResponse = await fetch(`${API_URL}/candidates/1`)
         const candidateData = candidateResponse.ok ? await candidateResponse.json() : null
 
         const fallback = {

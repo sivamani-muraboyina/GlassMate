@@ -1,6 +1,6 @@
 I am building a portfolio-grade GenAI project called:
 
-JOBPILOT
+GlassMate
 
 It is an AI-powered job discovery, evaluation, application preparation,
 and application tracking system.
@@ -438,12 +438,21 @@ Limit revision cycles to prevent infinite loops.
 
 The system supports application modes:
 
-AUTO
-SUGGEST
-MANUAL
+PREPARE
+APPROVAL_REQUIRED
+AUTO_APPLY
 
-Where a job source/API permits programmatic application:
-AUTO can execute the application.
+PREPARE:
+GlassMate prepares the application but the user performs the final
+application manually.
+
+APPROVAL_REQUIRED:
+GlassMate prepares the application, runs the Critic, and requires
+explicit user approval before performing the external action.
+
+AUTO_APPLY:
+The user has explicitly enabled automatic application and the target
+application mechanism supports compliant automation.
 
 For LinkedIn Easy Apply, do not build prohibited browser
 automation or scraping.
@@ -759,3 +768,123 @@ Avoid:
 - agent loops without limits
 - uncontrolled autonomous actions
 - storing hallucinated information as truth
+
+--------------------------------------------------
+26. PHASE 21 — DEPLOYMENT
+--------------------------------------------------
+
+Phase 21 containerizes and operationalizes the existing GlassMate application
+through Docker, Docker Compose, CI automation, and environment-based
+configuration. The goal is reproducible local development and simple cloud
+deployment readiness.
+
+### Objectives
+
+- Backend FastAPI and frontend React are containerized
+- Docker Compose orchestrates PostgreSQL, backend, frontend with proper
+  networking and service dependencies
+- PostgreSQL data persists in a Docker volume
+- Alembic migrations run automatically on startup
+- Environment variables control all configuration
+- CORS is enabled for frontend-backend communication
+- Health checks enable readiness monitoring
+- GitHub Actions CI validates backend tests and frontend builds
+- Application is ready for simple cloud deployment (no Kubernetes/Terraform)
+- Documentation guides new developers through local and production setup
+
+### Implementation Requirements
+
+1. **Backend Dockerfile**
+   - Use lightweight Python 3.12+ base image
+   - Install dependencies from pyproject.toml
+   - Expose port 8000
+   - Run uvicorn on 0.0.0.0:8000
+   - Use environment variables for configuration
+   - Include .dockerignore to reduce image size
+
+2. **Frontend Dockerfile**
+   - Multi-stage build: compile React/Vite then serve
+   - Build stage installs dependencies and runs `npm run build`
+   - Production stage uses lightweight Node or static server
+   - Accept VITE_API_URL build argument (for backend URL configuration)
+   - Expose port 3000
+   - Include .dockerignore
+
+3. **Docker Compose**
+   - PostgreSQL service with persistent volume
+   - Backend service depends_on PostgreSQL (with health checks)
+   - Frontend service depends_on Backend
+   - Proper service naming for networking
+   - Environment variables passed to all services
+   - Port mappings for local access
+   - Health checks for all services
+
+4. **CORS Configuration**
+   - Add CORS middleware to FastAPI
+   - Allow frontend to communicate with backend
+   - Production should restrict origins (placeholder acceptable for demo)
+
+5. **Environment Configuration**
+   - .env.example documents all variables
+   - DATABASE_URL works in Docker Compose context
+   - VITE_API_URL configures frontend API endpoint
+   - POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB configurable
+   - ENVIRONMENT separates development from production
+   - No hardcoded secrets in Dockerfiles or Compose
+
+6. **Frontend API URL**
+   - Frontend code supports configurable API URL (via VITE_API_URL)
+   - Defaults to localhost:8000 for development
+   - Docker build passes URL at build time
+
+7. **Alembic Migrations**
+   - Migrations are source of truth (no Base.metadata.create_all in production)
+   - Fresh PostgreSQL database can be initialized via `alembic upgrade head`
+   - Migrations are included in backend Docker image
+   - Compose setup can run migrations on startup
+
+8. **Health Checks**
+   - Backend /health endpoint remains functional
+   - Docker health checks confirm service readiness
+   - Compose depends_on uses health checks where practical
+
+9. **GitHub Actions CI**
+   - Backend job: install dependencies, run pytest, fail if tests fail
+   - Frontend job: install dependencies, run build, fail if build fails
+   - CI uses PostgreSQL service container for backend tests
+   - No secrets or personal API keys required
+
+10. **Documentation**
+    - README includes "Quick Start with Docker Compose"
+    - README documents environment variables
+    - DEVELOPMENT.md documents Phase 21 and deployment procedure
+    - PROJECT_SPEC.md includes this Phase 21 specification
+
+### Validation Checklist
+
+Before declaring Phase 21 complete:
+
+- [ ] Backend Dockerfile builds successfully
+- [ ] Frontend Dockerfile builds successfully
+- [ ] Docker Compose configuration is valid
+- [ ] `docker compose up` starts all services
+- [ ] PostgreSQL initializes and accepts connections
+- [ ] Backend health endpoint responds on http://localhost:8000/health
+- [ ] Frontend loads on http://localhost:3000
+- [ ] Frontend can fetch from backend
+- [ ] Alembic migrations run successfully
+- [ ] GitHub Actions CI passes for both backend and frontend
+- [ ] No secrets are exposed in code, Dockerfile, or Compose
+- [ ] .gitignore excludes .env and Docker artifacts
+- [ ] All existing tests still pass
+- [ ] No existing functionality is broken
+
+### Non-Goals
+
+- Enterprise DevOps infrastructure
+- Kubernetes, ECS, EKS, Helm, Terraform, or similar
+- Automated cloud deployment
+- Service meshes or advanced monitoring
+- Database read replicas or sharding
+- Multi-region deployment
+- Complex CI/CD orchestration

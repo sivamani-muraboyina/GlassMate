@@ -69,4 +69,14 @@ an architecture-aligned layout and integrates visually with the existing
 backend contracts while preserving the current backend implementation.
 
 ## Phase 21 — Deployment
-Status: NOT STARTED
+Status: COMPLETE
+
+Phase 21 containerizes the GlassMate application for reproducible local
+development and simple cloud deployment. Backend and frontend are Dockerized,
+Docker Compose orchestrates PostgreSQL, backend, and frontend with proper
+networking and volume persistence. Alembic migrations are run on startup.
+CORS is enabled for frontend-backend communication. Environment variables
+control configuration across development and production. GitHub Actions CI
+validates backend tests and frontend builds. Health checks enable readiness
+monitoring. The deployment is portfolio-ready and simple enough for students
+to modify and extend.
